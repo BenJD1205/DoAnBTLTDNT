@@ -1,14 +1,3 @@
-export const COLOURS = {
-    white: "#ffffff",
-    black: "#000000",
-    green: "#00AC76",
-    red: "#C04345",
-    blue: "#0043F9",
-    backgroundLight: "#F0F0F3",
-    backgroundMedium: "#B9B9B9",
-    backgroundDark: "#777777",
-};
-
 export const Items = [
     {
         id: 1,
@@ -109,20 +98,3 @@ export const Items = [
         ],
     },
 ];
-
-import constants from "./constants";
-import theme, { COLORS, SIZES, FONTS, lightTheme, darkTheme } from "./theme";
-import images from "./images";
-import icons from "./icons";
-
-export {
-    constants,
-    theme,
-    COLORS,
-    SIZES,
-    FONTS,
-    images,
-    icons,
-    lightTheme,
-    darkTheme,
-}
