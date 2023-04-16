@@ -3,9 +3,9 @@ import { View, Animated, StyleSheet, Text} from 'react-native'
 import { TextButton } from '../../components';
 import { COLORS, SIZES, constants, FONTS } from '../../constants';
 import Walkthrough1 from './components/walkthrough1';
-// import Walkthrough2 from './Walkthrough2';
-// import Walkthrough3 from './Walkthrough3';
-// import Walkthrough4 from './Walkthrough4';
+import Walkthrough2 from './components/walkthrough2';
+import Walkthrough3 from './components/walkthrough3';
+import Walkthrough4 from './components/walkthrough4';
 
 const Walkthrough = ({navigation}) => {
 
@@ -106,9 +106,9 @@ const Walkthrough = ({navigation}) => {
               {/* Walkthrouhg images */}
               <View style={{ flex: 1, justifyContent:'center' }}>
                 {index == 0 && <Walkthrough1 />}
-                {/* {index == 1 && <Walkthrough2 animate={walkthrough2Animate} />}
+                {index == 1 && <Walkthrough2 animate={walkthrough2Animate} />}
                 {index == 2 && <Walkthrough3 animate={walkthrough3Animate} />}
-                {index == 3 && <Walkthrough4 animate={walkthrough4Animate} />} */}
+                {index == 3 && <Walkthrough4 animate={walkthrough4Animate} />}
               </View>
 
               {/* Title && Descriptions */}

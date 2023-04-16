@@ -5,12 +5,11 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     header: {
-        height: 80,
-        flexDirection: "row",
+        height: 140,
+        flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        lineHeight: 80,
-        padding: "auto",
+        marginTop:20,
     },
     title: {
         fontSize: 20,
@@ -19,7 +18,7 @@ const styles = StyleSheet.create({
     },
     form: {
         flex: 1,
-        padding: 20,
+        paddingHorizontal: 20,
         alignContent: "center",
     },
     inputContainer: {

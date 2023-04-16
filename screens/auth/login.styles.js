@@ -5,11 +5,11 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     header: {
-        height: 80,
-        flexDirection: "row",
+        marginTop:20,
+        height: 180,
+        flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        lineHeight: 80,
         padding: "auto",
     },
     title: {

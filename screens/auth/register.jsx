@@ -1,5 +1,7 @@
-import { Text, View, TouchableOpacity, TextInput } from "react-native";
+import { Text, View, TouchableOpacity, TextInput,Image } from "react-native";
 import styles from "./register.styles";
+import {  images } from '../../constants';
+
 import React, { useState } from "react";
 
 const Register = ({ navigation }) => {
@@ -12,7 +14,13 @@ const Register = ({ navigation }) => {
     function renderHeader() {
         return (
             <View style={styles.header}>
-                <Text style={styles.title}>WELCOME YOU TO SHOP SHOE</Text>
+                <Text style={styles.title}>WELCOME YOU TO SHOP YOUR'S</Text>
+                <Image source={images.logo} 
+                    style={{
+                        width: 100,
+                        height: 100
+                    }} 
+                />
             </View>
         );
     }

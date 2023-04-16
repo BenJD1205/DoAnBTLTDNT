@@ -8,44 +8,46 @@ import {
 
 import { SIZES, images } from '../../../constants';
 
-const Walkthrough3 = () => {
+const Walkthrough4 = () => {
 
     return (
         <View style={{flex:1,overflow:'hidden'}}>
             <Image
-                source={images.walkthrough_03_01}
+                source={images.walkthrough_04_01}
                 style={{
                     ...styles.image,
-                    top: "30%",
-                    left:"25%",
+                    top: "25%",
+                    left: "30%",
+                    width: 150,
+                    height: 250,
                     zIndex:1,
                 }}
             />
 
             <Image
-                source={images.walkthrough_01_01}
+                source={images.walkthrough_04_02}
+                style={{
+                    ...styles.image,
+                    top: "20%",
+                    left:-5,
+                }}
+            />
+
+            <Image
+                source={images.walkthrough_04_03}
                 style={{
                     ...styles.image,
                     top: "30%",
-                    left:"12%"
+                    left:"80%"
                 }}
             />
 
             <Image
-                source={images.walkthrough_03_02}
+                source={images.walkthrough_04_04}
                 style={{
                     ...styles.image,
-                    top: "65%",
-                    left:"15%"
-                }}
-            />
-
-            <Image
-                source={images.walkthrough_01_02}
-                style={{
-                    ...styles.image,
-                    top: "60%",
-                    left:"60%"
+                    top: "62%",
+                    left:"85%"
                 }}
             />
         </View>
@@ -55,11 +57,11 @@ const Walkthrough3 = () => {
 const styles = StyleSheet.create({
     image:{
         position:'absolute',
-        width:106,
-        height:101,
-        zIndex:0,
+        width:86,
+        height:112,
+        zIndex:2,
         borderRadius: SIZES.radius
     }
 })
 
-export default Walkthrough3;
+export default Walkthrough4;

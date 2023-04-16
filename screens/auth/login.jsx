@@ -1,33 +1,40 @@
 import { Text, View, TextInput, TouchableOpacity, Image } from "react-native";
 import React, { useState } from "react";
+// import { useDispatch } from "react-redux";
+import {  images } from '../../constants';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import { publicAPI } from "../../utils/api";
+
 import styles from "./login.styles";
 
 const Login = ({ navigation }) => {
-    const [tendangnhap, setTenDangNhap] = useState("");
-    const [matkhau, setMatKhau] = useState("");
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
 
     function renderHeader() {
         return (
             <View style={styles.header}>
-                <Text style={styles.title}>WELCOME YOU TO SHOP SHOE</Text>
+                <Text style={styles.title}>WELCOME YOU TO SHOP YOUR'S</Text>
+                <Image source={images.logo} 
+                    style={{
+                        width: 100,
+                        height: 100
+                    }} 
+                />
             </View>
         );
     }
 
     const handleLogin = async () => {
-        navigation.navigate("Home");
-        // await fetch(`${config.backendPort}/auth/login`, {
-        //     method: "POST",
-        //     headers: { "Content-Type": "application/json" },
-        //     body: JSON.stringify({ tendangnhap, matkhau }),
-        // })
-        //     .then((res) => res.json())
-        //     .then((user) => {
-        //         console.log(user);
-        //         const data = user[0];
-        //         navigation.navigate("Loaihoa");
-        //     })
-        //     .catch((err) => console.log(err));
+        try{
+            const res = await publicAPI.post('/auth/login',{username: username, password: password})
+            await AsyncStorage.setItem('accessToken', res.data.accessToken);
+            navigation.navigate("Home");
+        }
+        catch(err){
+            console.log(err);
+        }
     };
 
     return (
@@ -38,8 +45,8 @@ const Login = ({ navigation }) => {
                     <Text style={styles.label}>Tên đăng nhập</Text>
                     <TextInput
                         style={styles.input}
-                        value={tendangnhap}
-                        onChangeText={(data) => setTenDangNhap(data)}
+                        value={username}
+                        onChangeText={(data) => setUsername(data)}
                     />
                 </View>
                 <View style={styles.inputContainer}>
@@ -47,8 +54,8 @@ const Login = ({ navigation }) => {
                     <TextInput
                         secureTextEntry={true}
                         style={styles.input}
-                        value={matkhau}
-                        onChangeText={(data) => setMatKhau(data)}
+                        value={password}
+                        onChangeText={(data) => setPassword(data)}
                     />
                 </View>
                 <TouchableOpacity style={styles.btn} onPress={handleLogin}>

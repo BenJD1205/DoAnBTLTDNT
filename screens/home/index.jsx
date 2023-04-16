@@ -7,14 +7,34 @@ import {
     TouchableOpacity,
     Image,
 } from "react-native";
+import jwtDecode from "jwt-decode";
+import { useDispatch } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { COLOURS, Items } from "../../constants";
 import Entypo from "react-native-vector-icons/Entypo";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { getCurrentUser } from "../../store/auth/auth.slice";
 
 const Home = ({ navigation }) => {
     const [products, setProducts] = useState([]);
     const [accessory, setAccessory] = useState([]);
+    
+    const dispatch  = useDispatch();
+
+    useEffect(() =>{
+        async function fetchData() {
+            const token = await AsyncStorage.getItem("accessToken");
+            const user = jwtDecode(token);
+
+            if (token) {
+                dispatch(getCurrentUser(user.id));
+            }else{
+                navigation.navigate("Login");
+            }
+        }
+        fetchData();    
+    },[])
 
     //get called on screen loads
     useEffect(() => {
