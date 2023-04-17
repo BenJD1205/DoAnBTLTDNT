@@ -1,16 +1,16 @@
 import { Text, View, TextInput, TouchableOpacity, Image } from "react-native";
 import React, { useState } from "react";
-// import { useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import {  images } from '../../constants';
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
-import { publicAPI } from "../../utils/api";
+import { signIn } from "../../store/auth/auth.slice";
 
 import styles from "./login.styles";
 
 const Login = ({ navigation }) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+
+    const dispatch = useDispatch();
 
     function renderHeader() {
         return (
@@ -28,9 +28,8 @@ const Login = ({ navigation }) => {
 
     const handleLogin = async () => {
         try{
-            const res = await publicAPI.post('/auth/login',{username: username, password: password})
-            await AsyncStorage.setItem('accessToken', res.data.accessToken);
-            navigation.navigate("Home");
+            dispatch(signIn({username,password}))
+            navigation.navigate("MyDrawer");
         }
         catch(err){
             console.log(err);

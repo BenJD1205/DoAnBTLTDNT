@@ -6,5 +6,6 @@ import Register from "./auth/register";
 import Walkthrough from './walkthrough';
 import Welcome from './walkthrough/welcome';
 import Profile from "./profile";
+import MyDrawer from './drawer';
 
-export { Home, Product, Cart, Login, Register,Walkthrough,Welcome,Profile };
+export { Home, Product, Cart, Login, Register,Walkthrough,Welcome,Profile,MyDrawer };
