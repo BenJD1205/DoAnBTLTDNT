@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -6,56 +6,74 @@ import {
     ScrollView,
     TouchableOpacity,
     Image,
-} from "react-native";
-import { useDispatch } from "react-redux";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { COLOURS, Items } from "../../constants";
-import Entypo from "react-native-vector-icons/Entypo";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
+    TextInput,
+} from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { COLOURS, Items } from '../../constants';
+import Entypo from 'react-native-vector-icons/Entypo';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { getUserInfo } from '../../store/auth/auth.slice';
+import { publicAPI } from '../../utils/api';
+import { getCart } from '../../store/cart/cart.slice';
 
 const Home = ({ navigation }) => {
     const [products, setProducts] = useState([]);
-    const [accessory, setAccessory] = useState([]);
+    const [search, setSearch] = useState('');
 
     const dispatch = useDispatch();
+    const { cartItems } = useSelector((state) => state.cart);
 
     //get called on screen loads
     useEffect(() => {
         async function checkToken() {
-              const token = await AsyncStorage.getItem("accessToken");
-      
-              if (!token) {
-                navigation.navigate("Login");
-              }else{
-                dispatch(getUserInfo())
-                navigation.navigate("Home");
-              }
-          }
-        const unsubscribe = navigation.addListener("focus", () => {
+            const token = await AsyncStorage.getItem('accessToken');
+
+            if (!token) {
+                navigation.navigate('Login');
+            } else {
+                dispatch(getUserInfo());
+                navigation.navigate('Home');
+            }
+        }
+        const getCarts = async () => {
+            const carts = await AsyncStorage.getItem('cartItems');
+            if (carts) {
+                const cartsArray = JSON.parse(carts);
+                dispatch(getCart(cartsArray));
+            }
+        };
+        const unsubscribe = navigation.addListener('focus', () => {
             checkToken();
+            getCarts();
             getDataFromDB();
         });
 
         return unsubscribe;
     }, [navigation]);
 
+    //search data
+    useEffect(() => {
+        if (search.length) {
+            const getDataSearch = async () => {
+                const res = await publicAPI.get('/products', { params: { search: search } });
+                setProducts(res.data);
+            };
+            getDataSearch();
+        }
+    }, [search]);
+
     //get data from DB
 
-    const getDataFromDB = () => {
-        let productList = [];
-        let accessoryList = [];
-        for (let index = 0; index < Items.length; index++) {
-            if (Items[index].category == "product") {
-                productList.push(Items[index]);
-            } else if (Items[index].category == "accessory") {
-                accessoryList.push(Items[index]);
-            }
-        }
-
-        setProducts(productList);
-        setAccessory(accessoryList);
+    const getDataFromDB = async () => {
+        const res = await publicAPI.get('/products', { params: { search: search } });
+        const filterProduct = search
+            ? res.data.filter((product) =>
+                  product.name.toLowerCase().includes(search.toLowerCase())
+              )
+            : res.data;
+        setProducts(filterProduct);
     };
 
     //create an product reusable card
@@ -63,59 +81,30 @@ const Home = ({ navigation }) => {
     const ProductCard = ({ data }) => {
         return (
             <TouchableOpacity
-                onPress={() =>
-                    navigation.navigate("ProductInfo", { productID: data.id })
-                }
+                onPress={() => navigation.navigate('ProductInfo', { id: data._id })}
                 style={{
-                    width: "48%",
+                    width: '48%',
                     marginVertical: 14,
                 }}
             >
                 <View
                     style={{
-                        width: "100%",
+                        width: '100%',
                         height: 100,
                         borderRadius: 10,
                         backgroundColor: COLOURS.backgroundLight,
-                        position: "relative",
-                        justifyContent: "center",
-                        alignItems: "center",
+                        position: 'relative',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                         marginBottom: 8,
                     }}
                 >
-                    {data.isOff ? (
-                        <View
-                            style={{
-                                position: "absolute",
-                                width: "20%",
-                                height: "24%",
-                                backgroundColor: COLOURS.green,
-                                top: 0,
-                                left: 0,
-                                borderTopLeftRadius: 10,
-                                borderBottomRightRadius: 10,
-                                alignItems: "center",
-                                justifyContent: "center",
-                            }}
-                        >
-                            <Text
-                                style={{
-                                    fontSize: 12,
-                                    color: COLOURS.white,
-                                    fontWeight: "bold",
-                                    letterSpacing: 1,
-                                }}
-                            >
-                                {data.offPercentage}%
-                            </Text>
-                        </View>
-                    ) : null}
                     <Image
-                        source={data.productImage}
+                        source={{ uri: data.img }}
                         style={{
-                            width: "80%",
-                            height: "80%",
-                            resizeMode: "contain",
+                            width: '80%',
+                            height: '80%',
+                            resizeMode: 'contain',
                         }}
                     />
                 </View>
@@ -123,64 +112,13 @@ const Home = ({ navigation }) => {
                     style={{
                         fontSize: 12,
                         color: COLOURS.black,
-                        fontWeight: "600",
+                        fontWeight: '600',
                         marginBottom: 2,
                     }}
                 >
-                    {data.productName}
+                    {data.name}
                 </Text>
-                {data.category == "accessory" ? (
-                    data.isAvailable ? (
-                        <View
-                            style={{
-                                flexDirection: "row",
-                                alignItems: "center",
-                            }}
-                        >
-                            <FontAwesome
-                                name="circle"
-                                style={{
-                                    fontSize: 12,
-                                    marginRight: 6,
-                                    color: COLOURS.green,
-                                }}
-                            />
-                            <Text
-                                style={{
-                                    fontSize: 12,
-                                    color: COLOURS.green,
-                                }}
-                            >
-                                Available
-                            </Text>
-                        </View>
-                    ) : (
-                        <View
-                            style={{
-                                flexDirection: "row",
-                                alignItems: "center",
-                            }}
-                        >
-                            <FontAwesome
-                                name="circle"
-                                style={{
-                                    fontSize: 12,
-                                    marginRight: 6,
-                                    color: COLOURS.red,
-                                }}
-                            />
-                            <Text
-                                style={{
-                                    fontSize: 12,
-                                    color: COLOURS.red,
-                                }}
-                            >
-                                Unavailable
-                            </Text>
-                        </View>
-                    )
-                ) : null}
-                <Text>&#8377; {data.productPrice}</Text>
+                <Text>&#8377; {data.price}</Text>
             </TouchableOpacity>
         );
     };
@@ -188,94 +126,124 @@ const Home = ({ navigation }) => {
     return (
         <View
             style={{
-                width: "100%",
-                height: "100%",
+                width: '100%',
+                height: '100%',
                 backgroundColor: COLOURS.white,
             }}
         >
-            <StatusBar
-                backgroundColor={COLOURS.white}
-                barStyle="dark-content"
-            />
-            <ScrollView showsVerticalScrollIndicator={false}>
-                <View
+            <StatusBar backgroundColor={COLOURS.white} barStyle="dark-content" />
+            <View
+                style={{
+                    width: '100%',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: 16,
+                }}
+            >
+                <TouchableOpacity onPress={() => navigation.openDrawer()}>
+                    <Entypo
+                        name="menu"
+                        style={{
+                            fontSize: 18,
+                            color: COLOURS.backgroundMedium,
+                            padding: 12,
+                            borderRadius: 10,
+                            backgroundColor: COLOURS.backgroundLight,
+                        }}
+                    />
+                </TouchableOpacity>
+                <View>
+                    <Text
+                        style={{
+                            color: '#383838',
+                            fontSize: 20,
+                            fontWeight: 500,
+                        }}
+                    >
+                        YOUR'S
+                    </Text>
+                </View>
+                <TouchableOpacity 
+                    onPress={() => navigation.navigate('MyCart')}
                     style={{
-                        width: "100%",
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        padding: 16,
+                        position:'relative',
+
                     }}
                 >
-                    <TouchableOpacity onPress={() => navigation.openDrawer()}>
-                        <Entypo
-                            name="menu"
-                            style={{
-                                fontSize: 18,
-                                color: COLOURS.backgroundMedium,
-                                padding: 12,
-                                borderRadius: 10,
-                                backgroundColor: COLOURS.backgroundLight,
-                            }}
-                        />
-                    </TouchableOpacity>
-                    <View>
-                        <Text
-                            style={{
-                                color: "#383838",
-                                fontSize: 20,
-                                fontWeight: 500,
-                            }}
-                        >
-                            YOUR'S
-                        </Text>
-                    </View>
-                    <TouchableOpacity
-                        onPress={() => navigation.navigate("MyCart")}
+                    <MaterialCommunityIcons
+                        name="cart"
+                        style={{
+                            fontSize: 18,
+                            color: COLOURS.backgroundMedium,
+                            padding: 12,
+                            borderRadius: 10,
+                            borderWidth: 1,
+                            borderColor: COLOURS.backgroundLight,
+                        }}
+                    />
+                    <Text 
+                        style={{
+                            position:'absolute',
+                            right: 0,
+                            top: -12,
+                            color: COLOURS.blue,
+                            backgroundColor: COLOURS.red,
+                            fontSize: 16,
+                            fontWeight: 500,
+                            borderRadius:10,
+                            padding:4,
+                        }}
                     >
-                        <MaterialCommunityIcons
-                            name="cart"
-                            style={{
-                                fontSize: 18,
-                                color: COLOURS.backgroundMedium,
-                                padding: 12,
-                                borderRadius: 10,
-                                borderWidth: 1,
-                                borderColor: COLOURS.backgroundLight,
-                            }}
-                        />
-                    </TouchableOpacity>
-                </View>
-                <View
+                        {cartItems.length}
+                    </Text>
+                </TouchableOpacity>
+            </View>
+            <View
+                style={{
+                    marginBottom: 10,
+                    padding: 16,
+                }}
+            >
+                <Text
                     style={{
+                        fontSize: 26,
+                        color: COLOURS.black,
+                        fontWeight: '500',
+                        letterSpacing: 1,
                         marginBottom: 10,
-                        padding: 16,
                     }}
                 >
-                    <Text
-                        style={{
-                            fontSize: 26,
-                            color: COLOURS.black,
-                            fontWeight: "500",
-                            letterSpacing: 1,
-                            marginBottom: 10,
-                        }}
-                    >
-                        YOUR'S Shop &amp; Service
-                    </Text>
-                    <Text
-                        style={{
-                            fontSize: 14,
-                            color: COLOURS.black,
-                            fontWeight: "400",
-                            letterSpacing: 1,
-                            lineHeight: 24,
-                        }}
-                    >
-                        YOUR'S shop on 594 Nguyen Kiem.
-                        {"\n"}This shop offers both products and services
-                    </Text>
-                </View>
+                    YOUR'S Shop &amp; Service
+                </Text>
+                <Text
+                    style={{
+                        fontSize: 14,
+                        color: COLOURS.black,
+                        fontWeight: '400',
+                        letterSpacing: 1,
+                        lineHeight: 24,
+                    }}
+                >
+                    YOUR'S shop on 594 Nguyen Kiem.
+                    {'\n'}This shop offers both products and services
+                </Text>
+            </View>
+            <View style={{ padding: 10 }}>
+                <TextInput
+                    placeholder="Search"
+                    name="search"
+                    value={search}
+                    onChangeText={(data) => setSearch(data)}
+                    style={{
+                        borderColor: '#9F9F9F',
+                        borderWidth: 1,
+                        borderRadius: 4,
+                        padding: 10,
+                    }}
+                />
+            </View>
+            <ScrollView showsVerticalScrollIndicator={false}>
                 <View
                     style={{
                         padding: 16,
@@ -283,22 +251,22 @@ const Home = ({ navigation }) => {
                 >
                     <View
                         style={{
-                            flexDirection: "row",
-                            alignItems: "center",
-                            justifyContent: "space-between",
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
                         }}
                     >
                         <View
                             style={{
-                                flexDirection: "row",
-                                alignItems: "center",
+                                flexDirection: 'row',
+                                alignItems: 'center',
                             }}
                         >
                             <Text
                                 style={{
                                     fontSize: 18,
                                     color: COLOURS.black,
-                                    fontWeight: "500",
+                                    fontWeight: '500',
                                     letterSpacing: 1,
                                 }}
                             >
@@ -308,19 +276,19 @@ const Home = ({ navigation }) => {
                                 style={{
                                     fontSize: 14,
                                     color: COLOURS.black,
-                                    fontWeight: "400",
+                                    fontWeight: '400',
                                     opacity: 0.5,
                                     marginLeft: 10,
                                 }}
                             >
-                                41
+                                {products.length}
                             </Text>
                         </View>
                         <Text
                             style={{
                                 fontSize: 14,
                                 color: COLOURS.blue,
-                                fontWeight: "400",
+                                fontWeight: '400',
                             }}
                         >
                             SeeAll
@@ -328,76 +296,13 @@ const Home = ({ navigation }) => {
                     </View>
                     <View
                         style={{
-                            flexDirection: "row",
-                            flexWrap: "wrap",
-                            justifyContent: "space-around",
+                            flexDirection: 'row',
+                            flexWrap: 'wrap',
+                            justifyContent: 'space-around',
                         }}
                     >
                         {products.map((data) => {
-                            return <ProductCard data={data} key={data.id} />;
-                        })}
-                    </View>
-                </View>
-
-                <View
-                    style={{
-                        padding: 16,
-                    }}
-                >
-                    <View
-                        style={{
-                            flexDirection: "row",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                        }}
-                    >
-                        <View
-                            style={{
-                                flexDirection: "row",
-                                alignItems: "center",
-                            }}
-                        >
-                            <Text
-                                style={{
-                                    fontSize: 18,
-                                    color: COLOURS.black,
-                                    fontWeight: "500",
-                                    letterSpacing: 1,
-                                }}
-                            >
-                                Accessories
-                            </Text>
-                            <Text
-                                style={{
-                                    fontSize: 14,
-                                    color: COLOURS.black,
-                                    fontWeight: "400",
-                                    opacity: 0.5,
-                                    marginLeft: 10,
-                                }}
-                            >
-                                78
-                            </Text>
-                        </View>
-                        <Text
-                            style={{
-                                fontSize: 14,
-                                color: COLOURS.blue,
-                                fontWeight: "400",
-                            }}
-                        >
-                            SeeAll
-                        </Text>
-                    </View>
-                    <View
-                        style={{
-                            flexDirection: "row",
-                            flexWrap: "wrap",
-                            justifyContent: "space-around",
-                        }}
-                    >
-                        {accessory.map((data) => {
-                            return <ProductCard data={data} key={data.id} />;
+                            return <ProductCard data={data} key={data._id} />;
                         })}
                     </View>
                 </View>

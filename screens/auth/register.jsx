@@ -1,6 +1,7 @@
 import { Text, View, TouchableOpacity, TextInput,Image } from "react-native";
 import styles from "./register.styles";
 import {  images } from '../../constants';
+import { publicAPI } from "../../utils/api";
 
 import React, { useState } from "react";
 
@@ -26,24 +27,20 @@ const Register = ({ navigation }) => {
     }
 
     const handleRegister = async () => {
-        navigation.navigate("Login");
-        // await fetch(`${config.backendPort}/auth/register`, {
-        //     method: "POST",
-        //     headers: { "Content-Type": "application/json" },
-        //     body: JSON.stringify({
-        //         tendangnhap,
-        //         tennguoidung,
-        //         email,
-        //         sodienthoai,
-        //         matkhau,
-        //     }),
-        // })
-        //     .then((res) => res.json())
-        //     .then((user) => {
-        //         console.log(user);
-        //         navigation.navigate("Login");
-        //     })
-        //     .catch((err) => console.log(err));
+        try {
+            const response = await publicAPI.post("/auth/register", {
+                tenDangNhap: tendangnhap,
+                tenNguoiDung: tennguoidung,
+                email: email,
+                sodienthoai: sodienthoai,
+                matKhau: matkhau
+            });
+            if (response.data) {
+                navigation.navigate("Login");
+            }
+        } catch (error) {
+            console.log(error);
+        } 
     };
 
     return (

@@ -11,13 +11,16 @@ import {
     Animated,
     ToastAndroid,
 } from "react-native";
+import { useDispatch } from "react-redux";
 import { COLOURS, Items } from "../../constants";
 import Entypo from "react-native-vector-icons/Entypo";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {publicAPI} from '../../utils/api';
+import { addToCart } from "../../store/cart/cart.slice";
 
 const ProductInfo = ({ route, navigation }) => {
-    const { productID } = route.params;
+    const { id } = route.params;
 
     const [product, setProduct] = useState({});
 
@@ -27,59 +30,34 @@ const ProductInfo = ({ route, navigation }) => {
 
     let position = Animated.divide(scrollX, width);
 
+    const dispatch = useDispatch();
+
     useEffect(() => {
         const unsubscribe = navigation.addListener("focus", () => {
             getDataFromDB();
         });
 
         return unsubscribe;
-    }, [navigation]);
+    }, [navigation,id]);
 
     //get product data by productID
 
     const getDataFromDB = async () => {
-        for (let index = 0; index < Items.length; index++) {
-            if (Items[index].id == productID) {
-                await setProduct(Items[index]);
-                return;
-            }
+        try{
+            const res = await publicAPI.get(`/products/${id}`);
+            setProduct(res.data)
+        }
+        catch(err){
+            console.log(err);
         }
     };
 
     //add to cart
-
-    const addToCart = async (id) => {
-        let itemArray = await AsyncStorage.getItem("cartItems");
-        itemArray = JSON.parse(itemArray);
-        if (itemArray) {
-            let array = itemArray;
-            array.push(id);
-
-            try {
-                await AsyncStorage.setItem("cartItems", JSON.stringify(array));
-                ToastAndroid.show(
-                    "Item Added Successfully to cart",
-                    ToastAndroid.SHORT
-                );
-                navigation.navigate("Home");
-            } catch (error) {
-                return error;
-            }
-        } else {
-            let array = [];
-            array.push(id);
-            try {
-                await AsyncStorage.setItem("cartItems", JSON.stringify(array));
-                ToastAndroid.show(
-                    "Item Added Successfully to cart",
-                    ToastAndroid.SHORT
-                );
-                navigation.navigate("Home");
-            } catch (error) {
-                return error;
-            }
-        }
-    };
+    const handleAddToCart = (product) =>{
+        dispatch(addToCart(product));
+        ToastAndroid.show("Item Added Successfully to cart",ToastAndroid.SHORT);
+        navigation.navigate('MyCart');
+    }
 
     //product horizontal scroll product card
     const renderProduct = ({ item, index }) => {
@@ -87,13 +65,13 @@ const ProductInfo = ({ route, navigation }) => {
             <View
                 style={{
                     width: width,
-                    height: 240,
+                    height: 200,
                     alignItems: "center",
                     justifyContent: "center",
                 }}
             >
                 <Image
-                    source={item}
+                    source={{uri:item}}
                     style={{
                         width: "100%",
                         height: "100%",
@@ -103,6 +81,8 @@ const ProductInfo = ({ route, navigation }) => {
             </View>
         );
     };
+
+    const imgProduct = [product.img];
 
     return (
         <View
@@ -155,11 +135,7 @@ const ProductInfo = ({ route, navigation }) => {
                         </TouchableOpacity>
                     </View>
                     <FlatList
-                        data={
-                            product.productImageList
-                                ? product.productImageList
-                                : null
-                        }
+                        data={imgProduct}
                         horizontal
                         renderItem={renderProduct}
                         showsHorizontalScrollIndicator={false}
@@ -259,7 +235,7 @@ const ProductInfo = ({ route, navigation }) => {
                                 maxWidth: "84%",
                             }}
                         >
-                            {product.productName}
+                            {product.name}
                         </Text>
                         <Ionicons
                             name="link-outline"
@@ -285,7 +261,7 @@ const ProductInfo = ({ route, navigation }) => {
                             marginBottom: 18,
                         }}
                     >
-                        {product.description}
+                        {product.description || 'Product is available'}
                     </Text>
                     <View
                         style={{
@@ -348,12 +324,12 @@ const ProductInfo = ({ route, navigation }) => {
                                 marginBottom: 4,
                             }}
                         >
-                            &#8377; {product.productPrice}.00
+                            &#8377; {product.price}.00
                         </Text>
                         <Text>
-                            Tax Rate 2%~ &#8377;{product.productPrice / 20}{" "}
+                            Tax Rate 2%~ &#8377;{product.price / 20}{" "}
                             (&#8377;
-                            {product.productPrice + product.productPrice / 20})
+                            {product.price + product.price / 20})
                         </Text>
                     </View>
                 </View>
@@ -369,9 +345,7 @@ const ProductInfo = ({ route, navigation }) => {
                 }}
             >
                 <TouchableOpacity
-                    onPress={() =>
-                        product.isAvailable ? addToCart(product.id) : null
-                    }
+                    onPress={() =>handleAddToCart(product)}
                     style={{
                         width: "86%",
                         height: "90%",
@@ -390,7 +364,7 @@ const ProductInfo = ({ route, navigation }) => {
                             textTransform: "uppercase",
                         }}
                     >
-                        {product.isAvailable ? "Add to cart" : "Not Avialable"}
+                        Add To Cart
                     </Text>
                 </TouchableOpacity>
             </View>

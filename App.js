@@ -1,46 +1,45 @@
-import { StatusBar } from "expo-status-bar";
-import { useCallback, useEffect, useState } from "react";
+import { StatusBar } from 'expo-status-bar';
+import { useCallback, useEffect, useState } from 'react';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-import { Provider } from "react-redux";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Cart, Product, Login, Register,Welcome,Walkthrough,MyDrawer } from "./screens";
-import {store} from './store';
+import { Provider } from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { Cart, Product, Login, Register, Welcome, Walkthrough, MyDrawer } from './screens';
+import { store } from './store';
 
 export default function App() {
+    const [token, setTokten] = useState(null);
 
-  const [token, setTokten] = useState(null);
-
-  useEffect(() =>{
-    async function fetchData() {
-        const token = await AsyncStorage.getItem("accessToken");
-        if(token){
-          setTokten(token);
-        }else{
-          setTokten(null);
+    useEffect(() => {
+        async function fetchData() {
+            const token = await AsyncStorage.getItem('accessToken');
+            if (token) {
+                setTokten(token);
+            } else {
+                setTokten(null);
+            }
         }
-    }
-    fetchData();    
-  },[])
+        fetchData();
+    }, []);
 
     const [fontsLoaded] = useFonts({
-        "Poppins-Black":require('./assets/fonts/Poppins-Black.ttf'),
-        "Poppins-Bold":require('./assets/fonts/Poppins-Bold.ttf'),
-        "Poppins-SemiBold":require('./assets/fonts/Poppins-SemiBold.ttf'),
-        "Poppins-Regular":require('./assets/fonts/Poppins-Regular.ttf'),
+        'Poppins-Black': require('./assets/fonts/Poppins-Black.ttf'),
+        'Poppins-Bold': require('./assets/fonts/Poppins-Bold.ttf'),
+        'Poppins-SemiBold': require('./assets/fonts/Poppins-SemiBold.ttf'),
+        'Poppins-Regular': require('./assets/fonts/Poppins-Regular.ttf'),
     });
-    
-      const onLayoutRootView = useCallback(async () => {
+
+    const onLayoutRootView = useCallback(async () => {
         if (fontsLoaded) {
-          await SplashScreen.hideAsync();
+            await SplashScreen.hideAsync();
         }
-      }, [fontsLoaded]);
-    
-      if (!fontsLoaded) {
+    }, [fontsLoaded]);
+
+    if (!fontsLoaded) {
         return null;
-      }
+    }
 
     const Stack = createNativeStackNavigator();
 
@@ -51,7 +50,7 @@ export default function App() {
                     screenOptions={{
                         headerShown: false,
                     }}
-                    initialRouteName={token ? "MyDrawer" : "Welcome"}
+                    initialRouteName={token ? 'MyDrawer' : 'Welcome'}
                 >
                     <Stack.Screen name="Welcome" component={Welcome} />
                     <Stack.Screen name="Walkthrough" component={Walkthrough} />

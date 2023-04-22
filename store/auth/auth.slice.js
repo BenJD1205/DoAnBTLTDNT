@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, isFulfilled } from "@reduxjs/toolkit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { publicAPI } from "../../utils/api";
@@ -27,11 +27,14 @@ export const authSlice = createSlice({
 
 export const { login,logout,setProperty, resetState } = authSlice.actions;
 
-function signIn (user){
+function signIn (user,navigation){
     return async (dispatch) => {
         try{
             const res = await publicAPI.post("/auth/login",{username:user.username,password:user.password});
             const userInfo = jwtDecode(res.data.accessToken);
+            if(res.data){
+                navigation.navigate("MyDrawer");
+            }
             dispatch(login(userInfo));
             await AsyncStorage.setItem('accessToken', res.data.accessToken);
         }

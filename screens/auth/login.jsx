@@ -28,8 +28,7 @@ const Login = ({ navigation }) => {
 
     const handleLogin = async () => {
         try{
-            dispatch(signIn({username,password}))
-            navigation.navigate("MyDrawer");
+            dispatch(signIn({username,password},navigation));
         }
         catch(err){
             console.log(err);
