@@ -14,8 +14,9 @@ import { COLOURS, Items } from '../../constants';
 import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { getUserInfo } from '../../store/auth/auth.slice';
+// import { getUserInfo } from '../../store/auth/auth.slice';
 import { publicAPI } from '../../utils/api';
+import { login } from '../../store/auth/auth.slice';
 import { getCart } from '../../store/cart/cart.slice';
 
 const Home = ({ navigation }) => {
@@ -33,7 +34,8 @@ const Home = ({ navigation }) => {
             if (!token) {
                 navigation.navigate('Login');
             } else {
-                dispatch(getUserInfo());
+                // dispatch(getUserInfo());
+                dispatch(login(token));
                 navigation.navigate('Home');
             }
         }
@@ -164,11 +166,10 @@ const Home = ({ navigation }) => {
                         YOUR'S
                     </Text>
                 </View>
-                <TouchableOpacity 
+                <TouchableOpacity
                     onPress={() => navigation.navigate('MyCart')}
                     style={{
-                        position:'relative',
-
+                        position: 'relative',
                     }}
                 >
                     <MaterialCommunityIcons
@@ -182,17 +183,17 @@ const Home = ({ navigation }) => {
                             borderColor: COLOURS.backgroundLight,
                         }}
                     />
-                    <Text 
+                    <Text
                         style={{
-                            position:'absolute',
+                            position: 'absolute',
                             right: 0,
                             top: -12,
                             color: COLOURS.blue,
                             backgroundColor: COLOURS.red,
                             fontSize: 16,
                             fontWeight: 500,
-                            borderRadius:10,
-                            padding:4,
+                            borderRadius: 10,
+                            padding: 4,
                         }}
                     >
                         {cartItems.length}

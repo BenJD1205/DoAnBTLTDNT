@@ -4,14 +4,21 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch, useSelector } from 'react-redux';
 import { COLOURS, Items } from '../../constants';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { decreaseCart, addToCart, removeFromCart, clearCart,getTotals } from '../../store/cart/cart.slice';
+import { publicAPI } from '../../utils/api';
+import {
+    decreaseCart,
+    addToCart,
+    removeFromCart,
+    clearCart,
+    getTotals,
+} from '../../store/cart/cart.slice';
 
 const MyCart = ({ navigation }) => {
-    const { cartItems,cartTotalQuantity,cartTotalAmount } = useSelector((state) => state.cart);
+    const { cartItems, cartTotalQuantity, cartTotalAmount } = useSelector((state) => state.cart);
 
     useEffect(() => {
         dispatch(getTotals());
-      }, [cartItems, dispatch]);
+    }, [cartItems, dispatch]);
 
     const dispatch = useDispatch();
 
@@ -36,14 +43,26 @@ const MyCart = ({ navigation }) => {
 
     const checkOut = async () => {
         try {
-            await AsyncStorage.removeItem('cartItems');
+            const token = await AsyncStorage.getItem('accessToken');
+            const res = await publicAPI.post(
+                '/bill/orders/create',
+                { total: cartTotalAmount },
+                {
+                    headers: {
+                        Authorization: token,
+                    },
+                }
+            );
+            if (res.data.success) {
+                navigation.navigate('Order');
+                await AsyncStorage.removeItem('cartItems');
+                ToastAndroid.show('Items will be Deliverd SOON!', ToastAndroid.SHORT);
+            }
         } catch (error) {
             return error;
         }
 
-        ToastAndroid.show('Items will be Deliverd SOON!', ToastAndroid.SHORT);
-
-        navigation.navigate('Home');
+        // navigation.navigate('Home');
     };
 
     const renderProducts = (data, index) => {
