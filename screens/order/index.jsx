@@ -6,25 +6,30 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { publicAPI } from '../../utils/api';
 import { COLOURS } from '../../constants';
+import { Loading } from '../../components';
 import styles from './checkout.styles';
 
 const Order = ({ navigation }) => {
     const { user } = useSelector((state) => state.auth);
     const [orders, setOrders] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (user) {
+            setLoading(true);
             const getDataFromDB = async () => {
                 try {
                     const res = await publicAPI.get(`/bill/orders/${user.id}`);
                     setOrders(res.data);
+                    setLoading(false);
                 } catch (err) {
+                    setLoading(false);
                     console.log(err);
                 }
             };
             getDataFromDB();
         }
-    }, [navigation, user.id]);
+    }, [navigation, user?.id]);
 
     function renderHeader() {
         return (
@@ -107,7 +112,7 @@ const Order = ({ navigation }) => {
     return (
         <View style={styles.container}>
             {renderHeader()}
-            <ScrollView>{renderContent()}</ScrollView>
+            {loading ? <Loading /> : <ScrollView>{renderContent()}</ScrollView>}
         </View>
     );
 };

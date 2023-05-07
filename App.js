@@ -6,6 +6,7 @@ import { Provider } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Toast from 'react-native-toast-message';
 import { Cart, Product, Login, Register, Welcome, Walkthrough, MyDrawer } from './screens';
 import { store } from './store';
 
@@ -60,6 +61,7 @@ export default function App() {
                     <Stack.Screen name="MyCart" component={Cart} />
                     <Stack.Screen name="ProductInfo" component={Product} />
                 </Stack.Navigator>
+                <Toast position="bottom" />
             </NavigationContainer>
         </Provider>
     );

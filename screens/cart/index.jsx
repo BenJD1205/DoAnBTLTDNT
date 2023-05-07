@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, ToastAndroid } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch, useSelector } from 'react-redux';
+import Toast from 'react-native-toast-message';
 import { COLOURS, Items } from '../../constants';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { publicAPI } from '../../utils/api';
@@ -56,7 +57,10 @@ const MyCart = ({ navigation }) => {
             if (res.data.success) {
                 navigation.navigate('Order');
                 await AsyncStorage.removeItem('cartItems');
-                ToastAndroid.show('Items will be Deliverd SOON!', ToastAndroid.SHORT);
+                Toast.show({
+                    type: 'success',
+                    text1: 'Checkout successfully',
+                });
             }
         } catch (error) {
             return error;

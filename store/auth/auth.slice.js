@@ -1,5 +1,6 @@
 import { createSlice, isFulfilled } from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Toast from 'react-native-toast-message';
 
 import { publicAPI } from '../../utils/api';
 import jwtDecode from 'jwt-decode';
@@ -39,9 +40,17 @@ function signIn(user, navigation) {
                 navigation.navigate('MyDrawer');
                 dispatch(login(userInfo));
                 await AsyncStorage.setItem('accessToken', res.data.accessToken);
+                Toast.show({
+                    type: 'success',
+                    text1: 'Login successfully',
+                });
             }
         } catch (err) {
             console.log(err);
+            Toast.show({
+                type: 'error',
+                text1: `${err.response.data.message}`,
+            });
         }
     };
 }

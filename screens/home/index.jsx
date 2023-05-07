@@ -13,7 +13,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { COLOURS, Items } from '../../constants';
 import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import jwtDecode from 'jwt-decode';
 // import { getUserInfo } from '../../store/auth/auth.slice';
 import { publicAPI } from '../../utils/api';
 import { login } from '../../store/auth/auth.slice';
@@ -35,7 +35,8 @@ const Home = ({ navigation }) => {
                 navigation.navigate('Login');
             } else {
                 // dispatch(getUserInfo());
-                dispatch(login(token));
+                const userInfo = jwtDecode(token);
+                dispatch(login(userInfo));
                 navigation.navigate('Home');
             }
         }

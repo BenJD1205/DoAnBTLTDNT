@@ -1,3 +1,4 @@
-import TextButton from "./TextButton";
+import TextButton from './TextButton';
+import Loading from './Loading';
 
-export { TextButton};
+export { TextButton, Loading };

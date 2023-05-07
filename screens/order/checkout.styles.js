@@ -58,13 +58,22 @@ const styles = StyleSheet.create({
         color: COLORS.dark60,
     },
     handle: {
-        color: COLORS.success80,
+        borderRadius: 4,
+        paddingHorizontal: 4,
+        color: COLORS.light,
+        backgroundColor: COLORS.success80,
     },
     done: {
-        color: COLORS.primary,
+        borderRadius: 4,
+        paddingHorizontal: 4,
+        color: COLORS.light,
+        backgroundColor: COLORS.primary,
     },
     transport: {
-        color: COLORS.support1,
+        borderRadius: 4,
+        paddingHorizontal: 4,
+        color: COLORS.light,
+        backgroundColor: COLORS.support1,
     },
     date: {
         color: COLORS.grey80,
